@@ -1,23 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import '../src/App.css'
+import { TiWeatherPartlySunny } from 'react-icons/ti';
+import { FiSearch } from 'react-icons/fi'
+import api from './services/api'
+import React, { useState } from 'react';
 
 function App() {
+
+const [weather, setweather] = useState('');
+const [data, setdata] = useState({});
+const [temp, settemp] = useState({});
+const [icon, seticon] = useState({});
+
+async function handleweather(){
+  if(weather === ''){
+    alert("Por favor preencha este campo")
+    return;
+  }
+
+  try {
+    const res = await api.get(`${weather}/&aqi=no`)
+    setdata(res.data.location);
+    settemp(res.data.current);
+    seticon(res.data.current.condition);
+    console.log(res.data);
+    setweather("")
+  } catch {
+    alert("Erro ao consultar");
+    setweather("");
+  }
+}
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 className='title'>Clima do Tempo</h1>
+      <div className="containerInput">
+      <input 
+        type="text"
+        placeholder="Digite o estado..." 
+        value={weather}
+        onChange={((e) => setweather(e.target.value))}
+        />
+
+        <button className="buttonSearch" onClick={handleweather}>
+          <FiSearch size={25} color="#ccc" />
+        </button>
+      </div>
+      <div className="card">
+        <h2>{data.name}</h2>
+        <span>{data.region}, {data.country}</span>
+        <h1>{temp.temp_c}°c</h1>
+        <img src={icon.icon} alt="" />
+        <span>{icon.text}</span>
+      </div>
     </div>
   );
 }
